@@ -1,0 +1,35 @@
+{
+  "name": "officer-mcp",
+  "version": "0.1.0",
+  "description": "Servidor MCP (Model Context Protocol) para a plataforma Officer EQI — permite que o Claude leia e gerencie empresas, pipeline, Hot List e Pipe Week.",
+  "type": "module",
+  "bin": {
+    "officer-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test": "node --test dist/test/"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "officer-eqi",
+    "pipeline",
+    "claude"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
