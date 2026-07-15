@@ -88,6 +88,36 @@ export interface Company {
   [extra: string]: unknown;
 }
 
+export type SugestaoStatus = 'aberta' | 'analise' | 'implementada' | 'descartada';
+
+export const SUG_STATUS_LABELS: Record<SugestaoStatus, string> = {
+  aberta: 'Aberta',
+  analise: 'Em análise',
+  implementada: 'Implementada',
+  descartada: 'Descartada',
+};
+
+export const SUG_CATEGORIES = [
+  'Interface',
+  'Funcionalidade',
+  'Relatório',
+  'Integração',
+  'Outro',
+] as const;
+
+export interface Sugestao {
+  id: string;
+  text: string;
+  cat: string;
+  status: SugestaoStatus;
+  votes: number;
+  voters: number[];
+  author: string;
+  authorId?: number;
+  date: string;
+  [extra: string]: unknown;
+}
+
 /** Formato do arquivo de backup completo exportado pela plataforma. */
 export interface Backup {
   type: 'officer_eqi_full_backup';
@@ -98,7 +128,7 @@ export interface Backup {
   data: Company[];
   nid: number;
   users?: unknown[];
-  sugestoes?: unknown[];
+  sugestoes?: Sugestao[];
   stickyNotes?: Record<string, unknown>;
   [extra: string]: unknown;
 }

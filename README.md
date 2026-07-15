@@ -19,6 +19,9 @@ O servidor expõe estas ferramentas para o Claude:
 | `atualizar_empresa` | Altera dados cadastrais, agenda/realiza R1, notas |
 | `atualizar_vertical` | Move verticais no funil (Pré R1 → R2 → Proposta → Negociação → Fechado), marca Hot List / Pipe Week |
 | `excluir_empresa` | Exclui uma empresa (exige ID exato + confirmação) |
+| `listar_sugestoes` | Lista as sugestões de melhoria da plataforma, por votos ou status |
+| `criar_sugestao` | Registra uma nova sugestão (Interface, Funcionalidade, Relatório…) |
+| `atualizar_sugestao` | Muda o status de uma sugestão (aberta → em análise → implementada) |
 | `importar_backup` | Carrega um backup JSON exportado pelo site |
 | `exportar_backup` | Gera um backup JSON pronto para importar de volta no site |
 
@@ -94,5 +97,6 @@ Estrutura:
 
 ## Segurança
 
+- **Leia o [SECURITY.md](SECURITY.md)** — o site publicado expõe dados de clientes e senhas no código-fonte; o script `scripts/sanitize-site.mjs` gera uma versão limpa para republicar.
 - **Nunca commite arquivos de dados reais** — o `.gitignore` já bloqueia `data/` e `*backup*.json`.
 - Os dados podem conter informações de clientes; trate o arquivo `OFFICER_DATA_FILE` como confidencial.

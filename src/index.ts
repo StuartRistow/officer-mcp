@@ -14,6 +14,9 @@ import {
   Company,
   PHASE_LABELS,
   STATUS_LABELS,
+  SUG_CATEGORIES,
+  SUG_STATUS_LABELS,
+  Sugestao,
   Vertical,
   VerticalStatus,
   newVerticals,
@@ -450,6 +453,77 @@ server.tool(
     store.removeCompany(id);
     store.save();
     return ok(`Empresa #${id} ${c.name} excluída do pipeline.`);
+  }
+);
+
+// ---------- tools: sugestões ----------
+
+const sugStatusEnum = z.enum(['aberta', 'analise', 'implementada', 'descartada']);
+
+server.tool(
+  'listar_sugestoes',
+  'Lista as sugestões de melhoria da plataforma, ordenadas por votos, com filtro opcional por status.',
+  {
+    status: sugStatusEnum.optional().describe('aberta, analise (em análise), implementada ou descartada'),
+  },
+  async ({ status }) => {
+    store.reload();
+    let sugs = [...store.sugestoes].sort((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
+    if (status) sugs = sugs.filter((s) => s.status === status);
+    if (!sugs.length) return ok('Nenhuma sugestão encontrada.');
+    return ok(
+      `${sugs.length} sugestão(ões):\n` +
+        sugs
+          .map(
+            (s) =>
+              `- [${s.id}] (${SUG_STATUS_LABELS[s.status] ?? s.status}, ▲${s.votes ?? 0}) ${s.cat}: ${s.text}` +
+              (s.author ? ` — por ${s.author}${s.date ? ` em ${s.date}` : ''}` : '')
+          )
+          .join('\n')
+    );
+  }
+);
+
+server.tool(
+  'criar_sugestao',
+  'Registra uma nova sugestão de melhoria da plataforma.',
+  {
+    texto: z.string().min(1).describe('Descrição da sugestão ou melhoria'),
+    categoria: z.enum(SUG_CATEGORIES).describe('Interface, Funcionalidade, Relatório, Integração ou Outro'),
+    autor: z.string().optional().describe('Nome de quem sugeriu (padrão: OFFICER_USER)'),
+  },
+  async ({ texto, categoria, autor }) => {
+    store.reload();
+    const sug: Sugestao = {
+      id: 's' + Date.now(),
+      text: texto,
+      cat: categoria,
+      status: 'aberta',
+      votes: 0,
+      voters: [],
+      author: autor ?? process.env.OFFICER_USER ?? 'officer-mcp',
+      date: new Date().toISOString().slice(0, 10),
+    };
+    store.sugestoes.push(sug);
+    store.save();
+    return ok(`Sugestão registrada: [${sug.id}] ${sug.cat}: ${sug.text}`);
+  }
+);
+
+server.tool(
+  'atualizar_sugestao',
+  'Muda o status de uma sugestão (aberta → em análise → implementada/descartada).',
+  {
+    id: z.string().describe('ID da sugestão (veja em listar_sugestoes)'),
+    status: sugStatusEnum.describe('Novo status'),
+  },
+  async ({ id, status }) => {
+    store.reload();
+    const s = store.sugestoes.find((x) => x.id === id);
+    if (!s) return fail(`Sugestão "${id}" não encontrada.`);
+    s.status = status;
+    store.save();
+    return ok(`Sugestão [${id}] agora está: ${SUG_STATUS_LABELS[status]}.`);
   }
 );
 

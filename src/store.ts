@@ -9,7 +9,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { Backup, Company, emptyBackup } from './model.js';
+import { Backup, Company, Sugestao, emptyBackup } from './model.js';
 
 const DEFAULT_DIR = path.join(os.homedir(), '.officer-mcp');
 const DEFAULT_FILE = path.join(DEFAULT_DIR, 'data.json');
@@ -51,6 +51,11 @@ export class Store {
 
   get companies(): Company[] {
     return this.backup.data;
+  }
+
+  get sugestoes(): Sugestao[] {
+    if (!Array.isArray(this.backup.sugestoes)) this.backup.sugestoes = [];
+    return this.backup.sugestoes;
   }
 
   nextId(): number {
